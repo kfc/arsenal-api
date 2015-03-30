@@ -15,7 +15,7 @@ $app = new \Slim\Slim(array(
 	)
 );
 
-if($config['useCache'] == false) {
+if(isset($config['useCache']) && $config['useCache'] == false) {
 	$api = new DrupalApi();
 	$api->clearCache();
 }

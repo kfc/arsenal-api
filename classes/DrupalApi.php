@@ -14,7 +14,7 @@ class DrupalApi {
 	function getCache($key) {
 		if(!empty($key)) {
 			$cache = $this->memcached->get($key);
-			if(!empty($cache)) {
+			if($cache !== false) {
 				return $cache;
 			}
 			else return null;
@@ -55,7 +55,7 @@ class DrupalApi {
 			//cache_clear_all($key, DrupalApi::CACHE_TABLE, $wildcard);
 		}
 		else {
-			$this->memcached->deleteMulti($this->memcached->getAllKeys());
+			$this->memcached->flush();
 		}
 	}
 
