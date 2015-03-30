@@ -62,7 +62,7 @@ class CommentsApi extends DrupalApi {
 				'uid' => $uid,
 				'pid' => 0,
 				'nid' => $nid,
-				'subject' => substr($comment, 10),
+				'subject' => mb_substr($comment, 10, 'UTF-8'),
 				'hostname' => $request->getIp(),
 				'created' => time(),
 				'changed' => time(),
