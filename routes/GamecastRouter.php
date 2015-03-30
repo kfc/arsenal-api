@@ -15,7 +15,7 @@ class GamecastRouter extends ApiRouter {
 			$data = $api->getCache($cache_key);
 			if($data == null) {
 				$data = $api->getGamecast($match_nid);
-				$api->setCache($cache_key, $data, CACHE_PERMANENT);
+				$api->setCache($cache_key, $data, 0);
 			}
 			$app->response->body($data);
 		});

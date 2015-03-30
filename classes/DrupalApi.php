@@ -5,10 +5,10 @@ class DrupalApi {
 
 	const CACHE_TABLE = 'cache_custom_api';
 	private $memcached;
+
 	function __construct() {
 		$this->memcached = new Memcached();
 		$this->memcached->addServer('127.0.0.1', 11211);
-
 	}
 
 	function getCache($key) {
@@ -38,7 +38,7 @@ class DrupalApi {
 		}*/
 	}
 
-	function clearCache($key, $wildcard = false)  {
+	function clearCache($key = '', $wildcard = false)  {
 		if(!empty($key)) {
 			if($wildcard) {
 				$keys_to_delete = array();
@@ -54,7 +54,11 @@ class DrupalApi {
 			}
 			//cache_clear_all($key, DrupalApi::CACHE_TABLE, $wildcard);
 		}
+		else {
+			$this->memcached->deleteMulti($this->memcached->getAllKeys());
+		}
 	}
+
 	function jsonResonse($data){
 		return json_encode(array(
 			'retrievedAt' => date('c'),

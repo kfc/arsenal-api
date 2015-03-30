@@ -4,9 +4,22 @@ require 'Slim/Slim.php';
 require 'import.php';
 require 'init.php';
 
+
+global $config;
+
 \Slim\Slim::registerAutoloader();
 
-$app = new \Slim\Slim();
+$app = new \Slim\Slim(array(
+	'mode' => isset($config['mode']) ? $config['mode'] : 'development',
+	'debug' => isset($config['debug']) ? $config['debug'] : true
+	)
+);
+
+if($config['useCache'] == false) {
+	$api = new DrupalApi();
+	$api->clearCache();
+}
+
 $app->response->headers->set('Content-Type', 'application/json; charset=utf-8');
 
 $newsApiRoutes = new NewsRouter($app);
