@@ -28,7 +28,8 @@ class NewsApi extends DrupalApi {
 					'nid' => $_row->nid,
 					'title' => $_row->title,
 					'teaser' => $_row->body_summary,
-					'image' =>  BASE_URL.'/'.variable_get('file_public_path','').'/'.file_uri_target($_row->uri),
+					'thumbnail' =>  $this->fileUrl($_row->uri, 'news_thumbnail'),
+					'image' =>  $this->fileUrl($_row->uri),
 					'created' => date('c', $_row->created)
 
 				);
@@ -63,7 +64,8 @@ class NewsApi extends DrupalApi {
                                         'nid' => $_row->nid,
                                         'title' => $_row->title,
                                         'teaser' => $_row->body_summary,
-                                        'image' =>  BASE_URL.'/'.variable_get('file_public_path','').'/'.file_uri_target($_row->uri),
+                                        'thumbnail' => $this->fileUrl($_row->uri, 'news_thumbnail'),
+                                        'image' => $this->fileUrl($_row->uri),
                                         'created' => date('c', $_row->created)
 
                                 );

@@ -15,12 +15,15 @@ $app = new \Slim\Slim(array(
 	)
 );
 
+$app->response->headers->set('Content-Type', 'application/json; charset=utf-8');
+$app->cache = new Cache();
+
 if(isset($config['useCache']) && $config['useCache'] == false) {
 	$api = new DrupalApi();
-	$api->clearCache();
+	$app->cache->clearCache();
 }
 
-$app->response->headers->set('Content-Type', 'application/json; charset=utf-8');
+
 
 $newsApiRoutes = new NewsRouter($app);
 $newsApiRoutes->init();

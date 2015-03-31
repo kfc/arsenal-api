@@ -7,6 +7,7 @@ require_once 'routes/GamecastRouter.php';
 
 
 
+require_once 'classes/Cache.php';
 require_once 'classes/DrupalApi.php';
 require_once 'classes/NewsApi.php';
 require_once 'classes/CommentsApi.php';

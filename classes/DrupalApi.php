@@ -2,61 +2,7 @@
 
 
 class DrupalApi {
-
-	const CACHE_TABLE = 'cache_custom_api';
-	private $memcached;
-
 	function __construct() {
-		$this->memcached = new Memcached();
-		$this->memcached->addServer('127.0.0.1', 11211);
-	}
-
-	function getCache($key) {
-		if(!empty($key)) {
-			$cache = $this->memcached->get($key);
-			if($cache !== false) {
-				return $cache;
-			}
-			else return null;
-		}
-		return null;
-
-		/*$cache = cache_get($key, DrupalApi::CACHE_TABLE);
-		if (!empty($cache) && $cache->data && (($cache->expire == CACHE_PERMANENT) || ( ($cache->expire != CACHE_PERMANENT) && ($cache->expire > time()) )  ) ) {
-			return $cache->data;
-		}
-		return null;*/
-	}
-
-	function setCache($key, $data, $expired = 5)  {
-		if(!empty($key)) {
-			$this->memcached->set($key, $data, $expired * 60);
-		}
-		/*if(!empty($key)) {
-
-			cache_set($key, $data, DrupalApi::CACHE_TABLE, ($expired != CACHE_PERMANENT ? (time()+ ($expired * 60)) : CACHE_PERMANENT ));
-		}*/
-	}
-
-	function clearCache($key = '', $wildcard = false)  {
-		if(!empty($key)) {
-			if($wildcard) {
-				$keys_to_delete = array();
-				$keys = $this->memcached->getAllKeys();
-				foreach($keys as $_key) {
-					if(strpos($_key, $key) !== false) {
-						$keys_to_delete[] = $_key;
-					}
-				}
-				if(!empty($keys_to_delete)) {
-					$this->memcached->deleteMulti($keys_to_delete);
-				}
-			}
-			//cache_clear_all($key, DrupalApi::CACHE_TABLE, $wildcard);
-		}
-		else {
-			$this->memcached->flush();
-		}
 	}
 
 	function jsonResonse($data){
@@ -64,6 +10,40 @@ class DrupalApi {
 			'retrievedAt' => date('c'),
 			'data' => $data
 		));
+	}
+
+	function fileUrl($uri, $style= '') {
+		if(empty($uri))
+			return $uri;
+
+		if (empty($style)) {
+			return BASE_URL.'/'.variable_get('file_public_path','').'/'.file_uri_target($uri);
+		}
+		else {
+			return BASE_URL.'/'.variable_get('file_public_path','').'/styles/news_thumbnail/public/'.file_uri_target($uri);
+		}
+
+
+	}
+
+	function videoUrl($uri) {
+		if(empty($uri))
+			return $uri;
+
+		$scheme = file_uri_scheme($uri);
+		$filename = file_uri_target(trim($uri, '/'));
+		if($scheme == 'youtube') {
+			return PROTOCOL.'youtube.com/'.$filename;
+		}
+		if($scheme == 'yandex') {
+			return PROTOCOL.'static.video.yandex.net/lite/'.$filename;
+		}
+		if($scheme == 'vimeo') {
+			return PROTOCOL.'player.vimeo.com/video/'.substr($filename,strrpos($filename, '/') + 1);
+		}
+		if($scheme == 'rutube') {
+			return PROTOCOL.'rutube.ru/play/embed/'.substr($filename,strrpos($filename, '/') + 1);
+		}
 	}
 
 	protected function getUser($uid, $uuid) {

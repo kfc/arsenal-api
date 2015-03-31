@@ -13,12 +13,11 @@ class CommentsRouter extends ApiRouter {
 		$cache_key = $this->cache_key;
 		$api = new CommentsApi();
 
-
 		$app->get('/comments/:nid(/:page)', function ($nid, $page = 1) use ($app, $cache_key, $api) {
-	        $data = $api->getCache($cache_key);
+	        $data = $app->cache->getCache($cache_key);
         	if($data == null) {
-                	$data = $api->getNodeComments($nid, $page);
-	                $api->setCache($cache_key, $data, 0);
+            $data = $api->getNodeComments($nid, $page);
+						$app->cache->setCache($cache_key, $data, 0);
        		 }
 	        $app->response->body($data);
 		});
@@ -29,7 +28,7 @@ class CommentsRouter extends ApiRouter {
 		$app->post('/comments/:nid',function ($nid) use ($app, $cache_key, $api) {
 			$data = $api->postComment($nid, $app->request);
 			if($data != null) {
-				$api->setCache($cache_key, $data, 0);
+				$app->cache->setCache($cache_key, $data, 0);
 			}
 			$app->response->body($data);
 		});
