@@ -2,7 +2,7 @@
 
 define('DRUPAL_ROOT', '../');
 define('HOSTNAME', $_SERVER['HTTP_HOST']);
-define('PROTOCOL', (isset($_SERVER['HTTPS']) ? 'https' : 'http').'://');
+define('PROTOCOL', (((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443) ? 'https' : 'http').'://');
 define('BASE_URL', PROTOCOL.HOSTNAME);
 
 require_once DRUPAL_ROOT.'/includes/bootstrap.inc';
