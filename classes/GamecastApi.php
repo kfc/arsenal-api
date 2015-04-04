@@ -63,6 +63,125 @@ class GamecastApi extends DrupalApi {
 		return $this->jsonResonse($return);
 	}
 
+	function getMatchInfo($match_nid) {
+		if((int)$match_nid <= 0 ){
+			return 'Invalid Data';
+		}
+
+		$result = db_select('node', 'n');
+
+		$result->innerJoin('field_data_field_match_opponent','opponent', 'opponent.entity_id = n.nid');
+		$result->innerJoin('node','opponent_node', 'opponent_node.nid = opponent.field_match_opponent_nid');
+
+		$result->innerJoin('field_data_field_match_season','season', 'n.nid = season.entity_id');
+		$result->innerJoin('taxonomy_term_data','season_term', 'season_term.tid = season.field_match_season_tid');
+
+		$result->innerJoin('field_data_field_match_tournament','tournament', 'n.nid = tournament.entity_id');
+		$result->innerJoin('taxonomy_term_data','tournament_term', 'tournament_term.tid = tournament.field_match_tournament_tid');
+
+		$result->innerJoin('field_data_field_match_round','round', 'n.nid = round.entity_id');
+
+		$result->innerJoin('field_data_field_match_place','place', 'n.nid = place.entity_id');
+
+		$result->innerJoin('field_data_field_match_start_date','date', 'n.nid = date.entity_id');
+
+		$result->innerJoin('field_data_field_match_stadium','stadium', 'stadium.entity_id = n.nid');
+		$result->innerJoin('node','stadium_node', 'stadium_node.nid = stadium.field_match_stadium_nid');
+
+		//$result->leftJoin('field_data_field_match_referee','referee', 'referee.entity_id = n.nid');
+		//$result->leftJoin('node','referee_node', 'referee_node.nid = referee.field_match_referee_nid');
+
+		//$result->leftJoin('field_data_field_match_attendance','attendance', 'n.nid = attendance.entity_id');
+
+		//$result->leftJoin('field_data_field_match_result','result', 'n.nid = result.entity_id');
+
+
+
+		$result->fields('n', array('title'));
+		$result->addField('opponent_node', 'title', 'opponent');
+		$result->addField('season_term', 'name', 'season');
+		$result->addField('tournament_term', 'name', 'tournament');
+		$result->addField('round', 'field_match_round_value', 'round');
+		$result->addField('place', 'field_match_place_value', 'place');
+		$result->addField('date', 'field_match_start_date_value', 'date_gmt');
+		$result->addField('stadium_node', 'title', 'stadium');
+		//$result->addField('referee_node', 'title', 'referee');
+		//$result->addField('attendance', 'field_match_attendance_value', 'attendance');
+		//$result->addField('result', 'field_match_result_value', 'result');
+
+
+		$result->condition('n.nid', $match_nid);
+		$result = $result->execute()
+			->fetchAll();
+
+
+		// Get match information that uses leftJoins. It is faster to execute separate queries
+		$matchResult = db_select('field_data_field_match_result','r')
+			->fields('r',array('field_match_result_value'))
+			->condition('entity_id', $match_nid)
+			->execute()
+			->fetchField();
+
+		$referee = db_select('field_data_field_match_referee','ref');
+		$referee->innerJoin('node','referee_node', 'referee_node.nid = ref.entity_id');
+		$referee->addField('referee_node', 'title');
+		$referee = $referee->condition('ref.entity_id', $match_nid)
+			->execute()
+			->fetchField();
+
+		$attendance = db_select('field_data_field_match_attendance','a')
+			->fields('a',array('field_match_attendance_value'))
+			->condition('entity_id', $match_nid)
+			->execute()
+			->fetchField();
+
+
+		if(is_array($result) && count($result) > 0) {
+			$result = array_pop($result);
+			if(is_object($result)) {
+				$result->result = (!empty($matchResult) ? $matchResult : null);
+				$result->referee = (!empty($referee) ? $referee : null);
+				$result->attendance = (!empty($attendance) ? $attendance : null);
+			}
+		}
+		return $this->jsonResonse($result);
+	}
+
+	function getMatchSquads($match_nid) {
+		if((int)$match_nid <= 0 ){
+			return 'Invalid Data';
+		}
+
+		$squad = db_select('field_data_field_match_arsenal_squad','squad');
+		$squad->innerJoin('node', 'n', 'n.nid = squad.field_match_arsenal_squad_nid');
+		$squad->leftJoin('field_data_field_person_number', 'number', 'number.entity_id = n.nid');
+		$squad->addField('n', 'title', 'player');
+		$squad->addField('n', 'nid', 'player_nid');
+		$squad->addField('number', 'field_person_number_value', 'number');
+
+		$squad->condition('squad.entity_id',$match_nid);
+
+		$squad->orderBy('squad.delta','ASC');
+		$squad = $squad->execute()->fetchAll();
+
+
+		$opponentSquad = db_select('field_data_field_match_opponent_squad','squad');
+		$opponentSquad->addField('squad', 'field_match_opponent_squad_value', 'squad');
+		$opponentSquad->condition('squad.entity_id',$match_nid);
+		$opponentSquad = $opponentSquad->execute()->fetchField();
+		if(!empty($opponentSquad)) {
+			$opponentSquad = preg_split('/(\\r)?\\n/', $opponentSquad);
+		}
+
+		$return = array(
+			'arsenal' => (!empty($squad) ? $squad : null),
+			'opponent' => (!empty($opponentSquad) ? $opponentSquad : null)
+		);
+
+		return $this->jsonResonse($return);
+
+	}
+
 	function _getArsenalEvents($match_nid) {
 		$result = db_select('field_data_field_match_events','evts');
 
@@ -78,6 +197,7 @@ class GamecastApi extends DrupalApi {
 		$result->addField('evts', 'field_match_events_value', 'event_id');
 		$result->addField('minute', 'field_match_event_minute_value', 'minute');
 		$result->addField('n', 'title', 'player');
+		$result->addField('n', 'nid', 'player_nid');
 		$result->addField('file_icon', 'uri', 'icon_url');
 		$result->addField('type_term', 'field_match_event_type_code_value', 'code');
 

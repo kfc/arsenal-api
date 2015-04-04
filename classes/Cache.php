@@ -49,6 +49,9 @@ class Cache {
 					$this->memcached->deleteMulti($keys_to_delete);
 				}
 			}
+			else{
+				$this->memcached->delete($key);
+			}
 			//cache_clear_all($key, self::CACHE_TABLE, $wildcard);
 		}
 		else {
