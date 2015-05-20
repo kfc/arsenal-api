@@ -4,7 +4,7 @@
 class NewsApi extends DrupalApi {
 
 	function get($page = 1) {
-
+		$itemsPerPage = 25;
 		if((int)$page <= 0){
 			return 'Invalid Data';
 		}
@@ -19,7 +19,7 @@ class NewsApi extends DrupalApi {
 						->condition('n.status', 1)
 						->condition('n.type', 'news')
 						->orderBy('n.created', 'DESC')
-						->range(($page - 1) * 25, $page * 25)
+						->range(($page - 1) * $itemsPerPage, $itemsPerPage)
 						->execute()
 						->fetchAllAssoc('nid');
 		if(!empty($result)) {
@@ -38,7 +38,7 @@ class NewsApi extends DrupalApi {
 		return $this->jsonResonse($return);
 	}
 	function getMatchNews($nid, $page = 1) {
-
+		$itemsPerPage = 25;
                 if((int)$nid <= 0 || (int)$page <= 0){
                         return 'Invalid Data';
                 }
@@ -55,13 +55,14 @@ class NewsApi extends DrupalApi {
                                                 ->condition('n.type', 'news')
 						->condition('nm.field_news_match_nid', $nid)
                                                 ->orderBy('n.created', 'DESC')
-                                                ->range(($page - 1) * 25, $page * 25)
+                                                ->range(($page - 1) * $itemsPerPage, $itemsPerPage)
                                                 ->execute()
                                                 ->fetchAllAssoc('nid');
                 if(!empty($result)) {
                         foreach($result as $_row) {
                                 $return[] = array(
                                         'nid' => $_row->nid,
+                                        'link' => url('node/'.$_row->nid, array('absolute'=>true)),
                                         'title' => $_row->title,
                                         'teaser' => $_row->body_summary,
                                         'thumbnail' => $this->fileUrl($_row->uri, 'news_thumbnail'),

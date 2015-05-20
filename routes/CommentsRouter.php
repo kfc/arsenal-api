@@ -26,11 +26,16 @@ class CommentsRouter extends ApiRouter {
 
 		// POST comment
 		$app->post('/comments/:nid',function ($nid) use ($app, $cache_key, $api) {
-			$data = $api->postComment($nid, $app->request);
+			$data = $api->postComment($nid, $app);
 			if($data != null) {
 				$app->cache->setCache($cache_key, $data, 0);
+				$app->response->body($data);
 			}
-			$app->response->body($data);
+			else {
+				$app->response->setStatus(400);
+				$app->response->body('Error');
+			}
+
 		});
 
 
