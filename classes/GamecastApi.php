@@ -38,6 +38,7 @@ class GamecastApi extends DrupalApi {
 
 		$result = $result->condition('m.field_gamecast_match_nid', $match_nid)
 			->orderBy('minute.field_gamecast_event_minute_value', 'DESC')
+			->orderBy('event_id', 'DESC')
 			->execute()
 			->fetchAllAssoc('event_id');
 
