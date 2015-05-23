@@ -150,7 +150,7 @@ class GamecastApi extends DrupalApi {
 			->fetchField();
 
 		$referee = db_select('field_data_field_match_referee','ref');
-		$referee->innerJoin('node','referee_node', 'referee_node.nid = ref.entity_id');
+		$referee->innerJoin('node','referee_node', 'referee_node.nid = ref.field_match_referee_nid');
 		$referee->addField('referee_node', 'title');
 		$referee = $referee->condition('ref.entity_id', $match_nid)
 			->execute()
