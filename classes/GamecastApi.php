@@ -37,7 +37,7 @@ class GamecastApi extends DrupalApi {
 		$result->addField('file_icon', 'uri', 'icon_url');
 
 		$result = $result->condition('m.field_gamecast_match_nid', $match_nid)
-			->orderBy('minute.field_gamecast_event_minute_value', 'DESC')
+			->orderBy('CAST(minute.field_gamecast_event_minute_value AS UNSIGNED)', 'DESC')
 			->orderBy('event_id', 'DESC')
 			->execute()
 			->fetchAllAssoc('event_id');
@@ -282,7 +282,7 @@ class GamecastApi extends DrupalApi {
 		$result->addField('type_term', 'field_match_event_type_code_value', 'code');
 
 		$result = $result->condition('evts.entity_id', $match_nid)
-			->orderBy('minute.field_match_event_minute_value', 'ASC')
+			->orderBy('CAST (minute.field_match_event_minute_value AS UNSIGNED)', 'ASC')
 			->execute()
 			->fetchAll();
 
@@ -319,7 +319,7 @@ class GamecastApi extends DrupalApi {
 		$result->addField('type_term', 'field_match_event_type_code_value', 'code');
 
 		$result = $result->condition('evts.entity_id', $match_nid)
-			->orderBy('minute', 'ASC')
+			->orderBy('CAST(minute AS UNSIGNED)', 'ASC')
 			->execute()
 			->fetchAll();
 
