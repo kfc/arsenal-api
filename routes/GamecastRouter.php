@@ -12,37 +12,37 @@ class GamecastRouter extends ApiRouter {
 		$cache_key = $this->cache_key;
 		$api = new GamecastApi();
 		$app->get('/gamecast/:match_nid', function ($match_nid) use ($app, $cache_key, $api) {
-			$data = $app->cache->getCache($cache_key);
+			$data = $app->cache->get($cache_key);
 			if($data == null) {
 				$data = $api->getGamecast($match_nid);
-				$app->cache->setCache($cache_key, $data, 0);
+				$app->cache->set($cache_key, $data, 0);
 			}
 			$app->response->body($data);
 		});
 
 		$app->get('/match-events/:match_nid', function ($match_nid) use ($app, $cache_key, $api) {
-			$data = $app->cache->getCache($cache_key);
+			$data = $app->cache->get($cache_key);
 			if($data == null) {
 				$data = $api->getMatchEvents($match_nid);
-				$app->cache->setCache($cache_key, $data, 0);
+				$app->cache->set($cache_key, $data, 0);
 			}
 			$app->response->body($data);
 		});
 
 		$app->get('/match-info/:match_nid', function ($match_nid) use ($app, $cache_key, $api) {
-			$data = $app->cache->getCache($cache_key);
+			$data = $app->cache->get($cache_key);
 			if($data == null) {
 				$data = $api->getMatchInfo($match_nid);
-				$app->cache->setCache($cache_key, $data, 0);
+				$app->cache->set($cache_key, $data, 0);
 			}
 			$app->response->body($data);
 		});
 
 		$app->get('/match-squads/:match_nid', function ($match_nid) use ($app, $cache_key, $api) {
-			$data = $app->cache->getCache($cache_key);
+			$data = $app->cache->get($cache_key);
 			if($data == null) {
 				$data = $api->getMatchSquads($match_nid);
-				$app->cache->setCache($cache_key, $data, 0);
+				$app->cache->set($cache_key, $data, 0);
 			}
 			$app->response->body($data);
 		});

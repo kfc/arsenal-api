@@ -48,7 +48,7 @@ class NewsApi extends DrupalApi {
                 $result->innerJoin('field_data_body', 'fdb', 'fdb.entity_id = n.nid');
                 $result->innerJoin('field_data_field_news_image', 'img', 'img.entity_id = n.nid');
                 $result->innerJoin('file_managed', 'file', 'file.fid = img.field_news_image_fid');
-		$result->innerJoin('field_data_field_news_match', 'nm', 'nm.entity_id = n.nid');
+								$result->innerJoin('field_data_field_news_match', 'nm', 'nm.entity_id = n.nid');
                 $result = $result->fields('fdb', array('body_summary'));
                 $result = $result->fields('file', array('uri'))
                                                 ->condition('n.status', 1)

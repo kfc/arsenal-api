@@ -14,19 +14,19 @@ class NewsRouter extends ApiRouter {
 		$api = new NewsApi();
 		$app->get('/news(/:page)', function ($page = 1) use ($app, $cache_key, $api) {
         	$api = new NewsApi();
-	        $data = $app->cache->getCache($cache_key);
+	        $data = $app->cache->get($cache_key);
         	if($data == null) {
-                	$data = $api->get($page);
-						$app->cache->setCache($cache_key, $data, CACHE_PERMANENT);
+            $data = $api->get($page);
+						$app->cache->set($cache_key, $data, CACHE_PERMANENT);
        		 }
 	        $app->response->body($data);
 		});
 
 		$app->get('/match-news/:nid(/:page)', function ($nid, $page = 1) use ($app, $cache_key, $api) {
-	        $data = $app->cache->getCache($cache_key);
+	        $data = $app->cache->get($cache_key);
         	if($data == null) {
             $data = $api->getMatchNews($nid, $page);
-						$app->cache->setCache($cache_key, $data, CACHE_PERMANENT );
+						$app->cache->set($cache_key, $data, CACHE_PERMANENT );
         	}
 	        $app->response->body($data);
 		});

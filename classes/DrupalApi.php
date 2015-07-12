@@ -44,6 +44,12 @@ class DrupalApi {
 		if($scheme == 'rutube') {
 			return PROTOCOL.'rutube.ru/play/embed/'.substr($filename,strrpos($filename, '/') + 1);
 		}
+		if($scheme == 'public' && strpos($filename, 'video_ext') === 0) {
+			if(strpos($filename, 'video_ext.php?') !== 0) {
+				$filename = preg_replace("/(.*?)\.php/",'video_ext.php', $filename);
+			}
+			return PROTOCOL.'vk.com/'.$filename;
+		}
 	}
 
 	protected function getUser($uid, $uuid) {

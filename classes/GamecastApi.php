@@ -134,8 +134,9 @@ class GamecastApi extends DrupalApi {
 				if(!empty($_row->opponent_logo))
 					$_row->opponent_logo = $this->fileUrl($_row->opponent_logo);
 					$_row->arsenal_logo = $this->fileUrl('public://arsenal_logo_small.gif');
+
 					$dt = new DateTime($_row->date_gmt, new DateTimeZone('Europe/London'));
-					$dt->setTimezone(new DateTimeZone('Europe/Moscow'));
+					$dt->add(DateInterval::createFromDateString('4 hours'));
 					$_row->date_formatted_msk = $dt->format('d.m.Y G:i').' (мск)';
 					$_row->isOnline = (!empty($_row->online));
 					unset($_row->online);

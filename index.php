@@ -22,15 +22,27 @@ $app->container->singleton('user', function () {
 	return new User();
 });
 
+
+$app->container->singleton('cache', function () use ($config) {
+	$namespace = 'Cache\\';
+	if(isset($config['cacheStorage'])
+			&& !empty($config['cacheStorage'])
+			&& class_exists($namespace.ucfirst($config['cacheStorage']).'Cache')) {
+		$className = $namespace.ucfirst($config['cacheStorage']).'Cache';
+	} else {
+		$className = $namespace."ArrayCache";
+	}
+
+	return new $className();
+});
+
 require 'middleware.php';
 
 
 $app->response->headers->set('Content-Type', 'application/json; charset=utf-8');
-$app->cache = new Cache();
 //$app->user = User::getUserInfo($uid);
 if(isset($config['useCache']) && $config['useCache'] == false) {
-	$api = new DrupalApi();
-	$app->cache->clearCache();
+	$app->cache->clear();
 }
 
 

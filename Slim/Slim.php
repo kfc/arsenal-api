@@ -110,7 +110,6 @@ class Slim
     public static function autoload($className)
     {
         $thisClass = str_replace(__NAMESPACE__.'\\', '', __CLASS__);
-
         $baseDir = __DIR__;
 
         if (substr($baseDir, -strlen($thisClass)) === $thisClass) {
