@@ -38,6 +38,14 @@ class GamecastRouter extends ApiRouter {
 			$app->response->body($data);
 		});
 
+		$app->get('/match-squads/:match_nid', function ($match_nid) use ($app, $cache_key, $api) {
+			$data = $app->cache->get($cache_key);
+			if($data == null) {
+				$data = $api->getMatchSquads($match_nid);
+				$app->cache->set($cache_key, $data, 0);
+			}
+			$app->response->body($data);
+		});
 
 		$app->get('/tournament-table', function () use ($app, $cache_key, $api) {
 			$data = $app->cache->get($cache_key);
