@@ -334,5 +334,41 @@ class GamecastApi extends DrupalApi {
 		return $result;
 
 	}
+	
+	function getTournamentTable(){
+		$draw = '(CASE WHEN `winner` IS NULL THEN 1 ELSE 0 END)';
+		
+		$hwin = '(CASE WHEN `winner`=home.home_team THEN 1 ELSE 0 END)';
+		$hlose = '(CASE WHEN (`winner`<>home.home_team AND `winner` IS NOT NULL) THEN 1 ELSE 0 END)';
+
+		$home_query=db_select('tournament_table_results','home');
+		$home_query->fields('home',array('home_team','home_score','home_points'));
+		$home_query->addExpression($hwin,'win');
+		$home_query->addExpression($hlose,'lose');
+		$home_query->addExpression($draw,'draw');
+		
+		$gwin = '(CASE WHEN `winner`=guest.guest_team THEN 1 ELSE 0 END)';
+		$glose = '(CASE WHEN (`winner`<>guest.guest_team AND `winner` IS NOT NULL) THEN 1 ELSE 0 END)';
+		
+		$guest_query=db_select('tournament_table_results','guest');
+		$guest_query->fields('guest',array('guest_team','guest_score','guest_points'));
+		$guest_query->addExpression($gwin,'win');
+		$guest_query->addExpression($glose,'lose');
+		$guest_query->addExpression($draw,'draw');
+		
+		$home_query->union($guest_query,'UNION ALL');
+		$query  = db_select($home_query,'q');
+		$query->innerJoin('node','n','n.nid=q.team');
+		$query->fields('n',array('title'));
+		$query->addField('q','home_team','team');
+		$query->addExpression('COUNT(*)','games');
+		$query->addExpression('SUM(q.home_score)','score');
+		$query->addExpression('SUM(q.home_points)','points');
+		$query->addExpression('SUM(q.win)','wins');
+		$query->addExpression('SUM(q.lose)','loses');
+		$query->addExpression('SUM(q.draw)','draws');
+		$result = $query->groupBy('team')->execute()->fetchAll();
+		$this->jsonResonse($result);
+	}
 
 }
